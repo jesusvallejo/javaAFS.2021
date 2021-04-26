@@ -25,11 +25,12 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 		byte [] buffer = new byte[tam];
 		byte [] smallerBuffer; // in case we read less than expected
 		int read = F.read(buffer);
+		System.err.println(read);
 		if (read<0) // nothing to read
 			return null;
 		if (read<tam) {
-			smallerBuffer = new byte [read];
-			for(int k=0; k < buffer.length ;k++) {
+			smallerBuffer = new byte[read];
+			for(int k=0; k < read;k++) {
 				smallerBuffer[k]=buffer[k];
 			}
 			return smallerBuffer;
@@ -37,7 +38,8 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 		return buffer;
 	}
 	
-	public void close() throws RemoteException {
+	public void close() throws RemoteException,IOException {
+		this.F.close();
 		return;
 	}
 	public String getFileName() {

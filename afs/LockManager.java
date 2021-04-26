@@ -1,6 +1,7 @@
+package afs;
+
 // Clase de servidor que implementa cerrojos de lectura/escritura para los ficheros
 // NO MODIFICAR
-package afs;
 
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
