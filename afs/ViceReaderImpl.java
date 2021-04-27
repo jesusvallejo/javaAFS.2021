@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 	private static final String AFSDir = "AFSDir/";
@@ -13,32 +14,37 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 	private String fileName;
 	private String fileMode;
 	private String filePath;
-
-	public ViceReaderImpl(String fileName, String fileMode/* añada los parámetros que requiera */)
+	
+	
+	private ReentrantReadWriteLock lock;
+	private ViceImpl vice;
+	
+	public ViceReaderImpl(String fileName, String fileMode, ReentrantReadWriteLock lock, ViceImpl vice/* añada los parámetros que requiera */)
 			throws RemoteException , FileNotFoundException{ // Comprobar esto creo que se tira para arriba pero no estoy seguro
 		this.setFileName(fileName);
 		this.setFileMode(fileMode);
 		this.setFilePath(AFSDir+fileName);
+		this.setLock(lock);
+		this.setVice(vice);
 		F = new RandomAccessFile(filePath,fileMode);
 	}
 	public byte[] read(int tam) throws RemoteException , IOException {
 		byte [] buffer = new byte[tam];
-		byte [] smallerBuffer; // in case we read less than expected
+		this.lock.readLock().lock();
 		int read = F.read(buffer);
-		System.err.println(read);
-		if (read<0) // nothing to read
+		if (read<0) { // nothing to read
+			lock.readLock().unlock();
 			return null;
+		}
 		if (read<tam) {
-			smallerBuffer = new byte[read];
-			for(int k=0; k < read;k++) {
-				smallerBuffer[k]=buffer[k];
-			}
-			return smallerBuffer;
+		return shrinkBuffer(buffer,read);
 		}
 		return buffer;
 	}
 	
 	public void close() throws RemoteException,IOException {
+		this.lock.readLock().unlock();
+		vice.getLockManager().unbind(fileName);
 		this.F.close();
 		return;
 	}
@@ -59,6 +65,28 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
+	}
+	public ReentrantReadWriteLock getLock() {
+		return lock;
+	}
+	public void setLock(ReentrantReadWriteLock lock) {
+		this.lock = lock;
+	}
+	
+
+	public ViceImpl getVice() {
+		return vice;
+	}
+	public void setVice(ViceImpl vice) {
+		this.vice = vice;
+	}
+	
+	private byte [] shrinkBuffer(byte [] buffer, int bufferSize) {
+		byte [] smallerBuffer = new byte[bufferSize];
+		for(int k=0; k < bufferSize;k++) {
+			smallerBuffer[k]=buffer[k];
+		}
+		return smallerBuffer;
 	}
 	
 }       

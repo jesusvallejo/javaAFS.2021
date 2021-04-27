@@ -10,16 +10,20 @@ public class Venus {
 	private String envRP= "REGISTRY_PORT";
 	private String envB=  "BLOCKSIZE";
 	private Remote lookUpPath;
+	
 	private String registryHost;
 	private int registryPort;
 	private int blockSize;
 	private Vice lookUp;
+	
+	private VenusCB callback;
 	public Venus()throws MalformedURLException, RemoteException, NotBoundException{
 		this.setRegistryHost(System.getenv(envRH)); // get environmental REGISTRY_HOST
 		this.setRegistryPort(Integer.parseInt(System.getenv(envRP)));// get environmental REGISTRY_HOST and cat to Integer
 		this.setBlockSize(Integer.parseInt(System.getenv(envB)));// get environmental REGISTRY_HOST and cast to Integer
 		this.lookUpPath = Naming.lookup("//"+this.registryHost+":"+this.registryPort + "/AFS"); // example: //192.168.1.3:3333/AFS
 		this.setLookUp((Vice) lookUpPath);
+		this.callback = new VenusCBImpl();
 	}
 	
 
@@ -66,6 +70,10 @@ public class Venus {
 	public void setLookUpPath(Remote lookUpPath) {
 		this.lookUpPath = lookUpPath;
 	}
+	
+	public VenusCB getCallBack() {
+        return this.callback;
+    } 
 	
 }
 
