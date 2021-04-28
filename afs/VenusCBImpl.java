@@ -14,9 +14,11 @@ public class VenusCBImpl extends UnicastRemoteObject implements VenusCB {
     public void invalidate(String fileName /* añada los parámetros que requiera */)
         throws RemoteException, FileNotFoundException {
     	File dir = new File(cacheDir);
-    	for(File file: dir.listFiles()) 
+    	System.err.println("cache incoherent, clearing");
+    	for(File file: dir.listFiles()) {
     	    if (!file.isDirectory() && file.getName().equals(fileName)) 
     	        file.delete();
+    	}
         return;
     }
 }

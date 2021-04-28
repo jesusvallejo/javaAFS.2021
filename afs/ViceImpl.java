@@ -46,11 +46,15 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
 		this.lockManager = lockManager;
 	}
 	public void invalidate(String fileName, VenusCB callback) throws RemoteException, FileNotFoundException{
+		System.err.println("invalidando");
 		for (HashMap.Entry<String,ArrayList<VenusCB>> entry : CList.entrySet()) {
 			if(entry.getKey().equals(fileName)){
+				System.err.println("invalidando "+ fileName);
 				int i=0;
-				while(entry.getValue().size()<1){
+				while(entry.getValue().size()>1){
+					System.err.println("bucle");
 					if(!entry.getValue().get(i).equals(callback)){
+						System.err.println("eliminando "+ fileName);
 						entry.getValue().get(i).invalidate(fileName);
 						entry.getValue().remove(i);
 						i--;

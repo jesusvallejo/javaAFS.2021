@@ -62,22 +62,21 @@ public class VenusFile {
 		return;
 	}
 	public void close() throws RemoteException, IOException {
+		ViceWriter viceWriter = this.venus.getLookUp().upload(this.fileName,this.fileMode,venus.getCallBack());
+		int blockSize=this.venus.getBlockSize();
+		int bufferSize=0;
+		byte[] buffer = new byte[blockSize];
 		if(this.modified && this.fileMode.equals("rw")) { // 
-			ViceWriter viceWriter = this.venus.getLookUp().upload(this.fileName,this.fileMode,venus.getCallBack());
-			int blockSize=this.venus.getBlockSize();
-			int bufferSize=0;
-			byte[] buffer = new byte[blockSize];
 			this.F.seek(0);
 			while((bufferSize = this.F.read(buffer))!=-1) {
 				if(blockSize>bufferSize) 
 					viceWriter.write(shrinkBuffer(buffer,bufferSize));
 				else
 					viceWriter.write(buffer);
-			}
-			if(this.getModSize()!=F.length()) viceWriter.setLength(this.F.length());	
-			viceWriter.close();
+			}	
 		}
-
+		if(this.getModSize()!=F.length() && this.fileMode.equals("rw")) viceWriter.setLength(this.F.length());
+		viceWriter.close();
 		this.F.close();
 		this.modified = false;
 		return;

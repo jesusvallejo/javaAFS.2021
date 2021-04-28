@@ -34,14 +34,14 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
     }
 
 	public void write(byte [] b) throws RemoteException , IOException{
-		lock.writeLock().lock();
+		this.lock.writeLock().lock();
     	this.F.write(b);
         return;
     }
     public void close() throws RemoteException , IOException{
-    	vice.invalidate(fileName, callback);					// invalidar
-    	lock.writeLock().unlock();
-    	vice.getLockManager().unbind(fileName);
+    	this.vice.invalidate(fileName, callback);					// invalidar
+    	this.lock.writeLock().unlock();
+    	this.vice.getLockManager().unbind(fileName);
     	this.F.close();
         return;
     }

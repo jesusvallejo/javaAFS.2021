@@ -26,14 +26,14 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 		this.setFilePath(AFSDir+fileName);
 		this.setLock(lock);
 		this.setVice(vice);
-		F = new RandomAccessFile(filePath,fileMode);
+		this.F = new RandomAccessFile(filePath,fileMode);
 	}
 	public byte[] read(int tam) throws RemoteException , IOException {
 		byte [] buffer = new byte[tam];
 		this.lock.readLock().lock();
-		int read = F.read(buffer);
+		int read = this.F.read(buffer);
 		if (read<0) { // nothing to read
-			lock.readLock().unlock();
+			//this.lock.readLock().unlock();
 			return null;
 		}
 		if (read<tam) {
@@ -44,7 +44,7 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 	
 	public void close() throws RemoteException,IOException {
 		this.lock.readLock().unlock();
-		vice.getLockManager().unbind(fileName);
+		this.vice.getLockManager().unbind(fileName);
 		this.F.close();
 		return;
 	}
