@@ -34,7 +34,7 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
     }
 
 	public void write(byte [] b) throws RemoteException , IOException{
-		this.lock.writeLock().lock();
+		//this.lock.writeLock().lock();
     	this.F.write(b);
         return;
     }
@@ -47,6 +47,7 @@ public class ViceWriterImpl extends UnicastRemoteObject implements ViceWriter {
     }
     
     public void setLength(long len) throws RemoteException, IOException{
+    	//this.lock.writeLock().lock();
         this.F.setLength(len);
         return;
     }

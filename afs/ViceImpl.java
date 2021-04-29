@@ -21,19 +21,19 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
 	public synchronized ViceReader download(String fileName,String fileMode,VenusCB callback/* añada los parámetros que requiera */)
 			throws RemoteException, FileNotFoundException{
 		ReentrantReadWriteLock lock = lockManager.bind(fileName);
-		//lock.readLock().lock();
+		lock.readLock().lock();
 		ViceReader down = new ViceReaderImpl(fileName,fileMode,lock,this);
 		this.addClist(fileName, callback);
 		return down;
 	}
-	public ViceWriter upload(String fileName,String fileMode, VenusCB callback/* añada los parámetros que requiera */)
+	public synchronized ViceWriter upload(String fileName,String fileMode, VenusCB callback/* añada los parámetros que requiera */)
 			throws RemoteException , FileNotFoundException, IOException {
 		ReentrantReadWriteLock lock = lockManager.bind(fileName);
-		//lock.writeLock().lock();
+		lock.writeLock().lock();
 		ViceWriter up = new ViceWriterImpl(fileName, fileMode,lock,callback,this);
 		return up;
 	}
-	public synchronized HashMap<String,ArrayList<VenusCB>> getCoherencia() throws RemoteException{
+	public HashMap<String,ArrayList<VenusCB>> getCoherencia() throws RemoteException{
 		return CList;
 	}
 	public void setCoherencia(HashMap<String,ArrayList<VenusCB>> CList) {
@@ -46,18 +46,14 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
 		this.lockManager = lockManager;
 	}
 	public void invalidate(String fileName, VenusCB callback) throws RemoteException, FileNotFoundException{
-		System.err.println("invalidando");
 		for (HashMap.Entry<String,ArrayList<VenusCB>> entry : CList.entrySet()) {
 			if(entry.getKey().equals(fileName)){
-				System.err.println("invalidando "+ fileName);
 				int i=0;
 				while(entry.getValue().size()>1){
-					System.err.println("bucle");
 					if(!entry.getValue().get(i).equals(callback)){
-						System.err.println("eliminando "+ fileName);
+						System.err.println("eliminando");
 						entry.getValue().get(i).invalidate(fileName);
 						entry.getValue().remove(i);
-						i--;
 					}
 				}
 			}

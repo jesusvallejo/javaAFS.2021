@@ -23,10 +23,8 @@ public class VenusFile {
 		this.setFilePath(cacheDir + fileName);
 		File fileCache = new File(filePath);
 		if (fileCache.exists()) {
-			System.err.println("existe");
 			this.F = new RandomAccessFile(filePath, fileMode);}
 		else { // file not found , proceed to download
-			System.err.println("no existe");
 			viceReader = venus.getLookUp().download(fileName, fileMode,venus.getCallBack());
 			int blockSize = venus.getBlockSize();
 			byte [] buffer = new byte[blockSize];
@@ -62,11 +60,12 @@ public class VenusFile {
 		return;
 	}
 	public void close() throws RemoteException, IOException {
+		if (this.fileMode.equals("rw")) {
 		ViceWriter viceWriter = this.venus.getLookUp().upload(this.fileName,this.fileMode,venus.getCallBack());
 		int blockSize=this.venus.getBlockSize();
 		int bufferSize=0;
 		byte[] buffer = new byte[blockSize];
-		if(this.modified && this.fileMode.equals("rw")) { // 
+		if(this.modified) { // 
 			this.F.seek(0);
 			while((bufferSize = this.F.read(buffer))!=-1) {
 				if(blockSize>bufferSize) 
@@ -75,8 +74,9 @@ public class VenusFile {
 					viceWriter.write(buffer);
 			}	
 		}
-		if(this.getModSize()!=F.length() && this.fileMode.equals("rw")) viceWriter.setLength(this.F.length());
+		if(this.getModSize()!=F.length()) viceWriter.setLength(this.F.length());
 		viceWriter.close();
+		}
 		this.F.close();
 		this.modified = false;
 		return;

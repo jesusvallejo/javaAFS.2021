@@ -30,7 +30,7 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
 	}
 	public byte[] read(int tam) throws RemoteException , IOException {
 		byte [] buffer = new byte[tam];
-		this.lock.readLock().lock();
+		//this.lock.readLock().lock();
 		int read = this.F.read(buffer);
 		if (read<0) { // nothing to read
 			//this.lock.readLock().unlock();
