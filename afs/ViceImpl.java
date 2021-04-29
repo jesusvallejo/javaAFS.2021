@@ -52,9 +52,11 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
 				while(entry.getValue().size()>1){
 					if(!entry.getValue().get(i).equals(callback)){
 						System.err.println("eliminando");
+						
 						entry.getValue().get(i).invalidate(fileName);
 						entry.getValue().remove(i);
 					}
+					else i++;
 				}
 			}
 		}
